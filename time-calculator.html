@@ -164,16 +164,17 @@
   }
 
   .dur-input {
-    flex: 0 0 68px;
+    flex: 0 0 56px;
     font-size: 16px;
     background: var(--bg);
     border: 0.5px solid var(--border2);
     border-radius: var(--radius);
-    padding: 9px 10px;
+    padding: 9px 6px;
     color: var(--text);
     font-family: var(--font);
     outline: none;
     -webkit-appearance: none;
+    text-align: center;
   }
   .dur-input:focus { border-color: var(--text2); }
 
@@ -232,7 +233,7 @@
   <div class="entry-block">
     <div class="section-label" style="margin-bottom:10px">Add a step</div>
     <div class="entry-row">
-      <input class="dur-input" id="durInput" type="text" placeholder="45m / 1h30" autocomplete="off" autocorrect="off" inputmode="text" />
+      <input class="dur-input" id="durInput" type="text" placeholder="45" autocomplete="off" autocorrect="off" inputmode="text" />
       <input class="memo-input" id="memoInput" type="text" placeholder="label (optional)" autocomplete="off" autocorrect="off" />
     </div>
     <button class="add-btn" id="addBtn">Add step</button>
