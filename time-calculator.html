@@ -244,7 +244,7 @@
       <input class="memo-input" id="memoInput" type="text" placeholder="label (optional)" autocomplete="off" autocorrect="off" />
     </div>
     <button class="add-btn" id="addBtn">Add step</button>
-    <div class="hint">45 · 45m · 1h30 · 1h 30m · 90</div>
+    <div class="hint">45 · 1h30 · 1:30 · 1.5h · 90</div>
   </div>
 
 </div>
@@ -269,17 +269,36 @@ function parseTime(str) {
 }
 
 function parseDuration(str) {
-  str = str.trim().toLowerCase();
-  let total = 0;
-  const h = str.match(/(\d+)\s*h/);
-  const m = str.match(/(\d+)\s*m(?!o)/);
-  if (h) total += parseInt(h[1]) * 60;
-  if (m) total += parseInt(m[1]);
-  if (!h && !m) {
-    const n = parseInt(str);
-    if (!isNaN(n)) total = n;
+  str = str.trim().toLowerCase().replace(/\s+/g, '');
+  if (!str) return null;
+
+  // 1:30 → 1h 30m
+  const colon = str.match(/^(\d+):(\d{1,2})$/);
+  if (colon) {
+    return parseInt(colon[1]) * 60 + parseInt(colon[2]);
   }
-  return total > 0 ? total : null;
+
+  // 1.5h or .5h → decimal hours
+  const decH = str.match(/^(\d*\.\d+)h$/);
+  if (decH) {
+    return Math.round(parseFloat(decH[1]) * 60);
+  }
+
+  // 1h35, 1h35m, 1h 35m, 2h
+  const hm = str.match(/^(\d+)h(\d*)(?:m)?$/);
+  if (hm) {
+    const h = parseInt(hm[1]);
+    const m = hm[2] ? parseInt(hm[2]) : 0;
+    return h * 60 + m;
+  }
+
+  // 45m or 45
+  const justM = str.match(/^(\d+)m?$/);
+  if (justM) {
+    return parseInt(justM[1]);
+  }
+
+  return null;
 }
 
 function formatTime(mins) {
