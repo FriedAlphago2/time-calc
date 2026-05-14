@@ -154,17 +154,22 @@
     border-radius: var(--radius-lg);
     padding: 14px 16px;
     margin-bottom: 8px;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .entry-row {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
     margin-bottom: 10px;
+    width: 100%;
   }
 
   .dur-input {
     flex: 0 0 56px;
+    width: 56px;
+    min-width: 0;
     font-size: 16px;
     background: var(--bg);
     border: 0.5px solid var(--border2);
@@ -179,7 +184,9 @@
   .dur-input:focus { border-color: var(--text2); }
 
   .memo-input {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;
+    width: 100%;
     font-size: 15px;
     background: var(--bg);
     border: 0.5px solid var(--border2);
