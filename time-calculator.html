@@ -81,6 +81,31 @@
   }
   .start-time-input:focus { border-bottom-color: var(--text2); }
 
+  /* Schedule name banner */
+  .schedule-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    min-height: 16px;
+  }
+  .schedule-name {
+    font-size: 12px;
+    color: var(--text2);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .schedule-name-dot {
+    color: var(--text3);
+    margin: 0 6px;
+  }
+  .schedule-name-meta {
+    color: var(--text3);
+    font-weight: 400;
+  }
+
   /* Timeline */
   .timeline { flex: 1; margin-bottom: 20px; }
 
@@ -182,19 +207,31 @@
   .total-label { font-size: 13px; color: var(--text3); }
   .total-val { font-size: 13px; font-weight: 500; color: var(--text2); }
 
-  .clear-btn {
+  /* Action row replaces the lone Clear button */
+  .action-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 8px;
+    gap: 6px;
+  }
+  .action-row-left, .action-row-right {
+    display: flex;
+    gap: 14px;
+  }
+  .text-btn {
     font-size: 12px;
-    color: var(--text3);
+    color: var(--text2);
     background: none;
     border: none;
     cursor: pointer;
-    text-decoration: underline;
     padding: 4px 0;
     font-family: var(--font);
-    display: block;
-    text-align: right;
-    width: 100%;
+    -webkit-appearance: none;
   }
+  .text-btn:active { color: var(--text3); }
+  .text-btn.muted { color: var(--text3); text-decoration: underline; }
+  .text-btn:disabled { color: var(--text3); opacity: 0.4; cursor: default; }
 
   /* Entry block */
   .entry-block {
@@ -248,29 +285,150 @@
   .memo-input:focus { border-color: var(--text2); }
   .memo-input::placeholder, .dur-input::placeholder { color: var(--text3); }
 
-  .add-btn {
-    width: 100%;
-    padding: 10px;
-    font-size: 15px;
-    font-weight: 500;
+  .error { border-color: #c0392b !important; }
+
+  /* Sheet (modal) for Load / Save-as */
+  .sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 100;
+  }
+  .sheet-backdrop.open { display: flex; }
+  @media (min-width: 520px) {
+    .sheet-backdrop { align-items: center; }
+  }
+  .sheet {
     background: var(--bg);
+    width: 100%;
+    max-width: 480px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: 18px 18px max(env(safe-area-inset-bottom), 18px);
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 -4px 30px rgba(0,0,0,0.18);
+  }
+  @media (min-width: 520px) {
+    .sheet { border-radius: var(--radius-lg); }
+  }
+
+  .sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .sheet-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .sheet-close {
+    font-size: 22px;
+    color: var(--text3);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+  }
+
+  .schedule-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .schedule-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 0;
+    border-bottom: 0.5px solid var(--border);
+    cursor: pointer;
+  }
+  .schedule-item:first-child { border-top: 0.5px solid var(--border); }
+  .schedule-item:active { background: var(--bg2); }
+  .schedule-item-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .schedule-item-name {
+    font-size: 16px;
+    color: var(--text);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .schedule-item-meta {
+    font-size: 12px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+  .schedule-item-delete {
+    font-size: 20px;
+    color: var(--text3);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 8px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .schedule-item-delete:active { opacity: 0.5; }
+
+  .sheet-empty {
+    font-size: 14px;
+    color: var(--text3);
+    padding: 24px 0;
+    text-align: center;
+  }
+
+  /* Save-as form */
+  .sheet-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .sheet-input {
+    font-size: 16px;
+    background: var(--bg2);
     border: 0.5px solid var(--border2);
     border-radius: var(--radius);
+    padding: 12px;
+    color: var(--text);
+    font-family: var(--font);
+    outline: none;
+    -webkit-appearance: none;
+    width: 100%;
+  }
+  .sheet-input:focus { border-color: var(--text2); }
+  .sheet-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .sheet-btn {
+    flex: 1;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--bg2);
     color: var(--text);
     cursor: pointer;
     font-family: var(--font);
     -webkit-appearance: none;
   }
-  .add-btn:active { background: var(--bg3); }
-
-  .hint {
-    font-size: 11px;
-    color: var(--text3);
-    margin-top: 8px;
-    text-align: center;
+  .sheet-btn.primary {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
   }
-
-  .error { border-color: #c0392b !important; }
+  .sheet-btn:active { opacity: 0.7; }
+  .sheet-btn:disabled { opacity: 0.4; cursor: default; }
 </style>
 </head>
 <body>
@@ -280,6 +438,8 @@
     <div class="section-label">Start time</div>
     <input class="start-time-input" id="startInput" type="text" placeholder="e.g. 9:00 AM" autocomplete="off" autocorrect="off" />
   </div>
+
+  <div class="schedule-name-row" id="scheduleNameRow"></div>
 
   <div class="timeline" id="timeline">
     <div class="timeline-empty">Add steps below to build your timeline.</div>
@@ -295,8 +455,37 @@
 
 </div>
 
+<!-- Load sheet -->
+<div class="sheet-backdrop" id="loadSheet">
+  <div class="sheet">
+    <div class="sheet-header">
+      <div class="sheet-title">Load schedule</div>
+      <button class="sheet-close" onclick="closeSheet('loadSheet')" aria-label="Close">×</button>
+    </div>
+    <div id="loadSheetBody"></div>
+  </div>
+</div>
+
+<!-- Save-as sheet -->
+<div class="sheet-backdrop" id="saveSheet">
+  <div class="sheet">
+    <div class="sheet-header">
+      <div class="sheet-title" id="saveSheetTitle">Save schedule</div>
+      <button class="sheet-close" onclick="closeSheet('saveSheet')" aria-label="Close">×</button>
+    </div>
+    <div class="sheet-form">
+      <input class="sheet-input" id="saveNameInput" type="text" placeholder="Schedule name" autocomplete="off" enterkeyhint="done" />
+      <div class="sheet-actions">
+        <button class="sheet-btn" onclick="closeSheet('saveSheet')">Cancel</button>
+        <button class="sheet-btn primary" id="saveConfirmBtn" onclick="confirmSave()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 const steps = [];
+let currentScheduleName = '';
 
 function parseTime(str) {
   str = str.trim();
@@ -371,7 +560,19 @@ function escapeHtml(s) {
   return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+function renderScheduleName() {
+  const row = document.getElementById('scheduleNameRow');
+  if (currentScheduleName) {
+    const stepCount = steps.length;
+    const label = stepCount === 1 ? '1 step' : stepCount + ' steps';
+    row.innerHTML = `<div class="schedule-name">${escapeHtml(currentScheduleName)}<span class="schedule-name-dot">·</span><span class="schedule-name-meta">${label}</span></div>`;
+  } else {
+    row.innerHTML = '';
+  }
+}
+
 function render() {
+  renderScheduleName();
   const tl = document.getElementById('timeline');
   if (!steps.length) {
     tl.innerHTML = '<div class="timeline-empty">Add steps below to build your timeline.</div>';
@@ -406,7 +607,15 @@ function render() {
     }
   });
   html += `<div class="total-row"><span class="total-label">Total elapsed</span><span class="total-val">${formatDur(total)}</span></div>`;
-  html += `<button class="clear-btn" onclick="clearAll()">Clear all</button>`;
+  html += `<div class="action-row">
+    <div class="action-row-left">
+      <button class="text-btn" onclick="openLoadSheet()">Load</button>
+      <button class="text-btn" onclick="openSaveSheet()" ${steps.length ? '' : 'disabled'}>Save</button>
+    </div>
+    <div class="action-row-right">
+      <button class="text-btn muted" onclick="clearAll()">Clear all</button>
+    </div>
+  </div>`;
   tl.innerHTML = html;
 
   if (editingIndex >= 0) {
@@ -416,16 +625,13 @@ function render() {
     dEl.select();
     let committed = false;
 
-    // Apply the duration value to steps[] right now (without exiting edit mode)
     const applyDur = () => {
       const newDur = parseDuration(dEl.value);
       if (newDur) steps[editingIndex].dur = newDur;
     };
-    // Apply the label value to steps[] right now
     const applyLabel = () => {
       steps[editingIndex].memo = lEl.value.trim();
     };
-    // Final commit: apply both and exit edit mode
     const commit = () => {
       if (committed) return;
       committed = true;
@@ -443,7 +649,6 @@ function render() {
       }, 100);
     };
 
-    // Apply duration on every keystroke so it's never lost
     dEl.addEventListener('input', applyDur);
     lEl.addEventListener('input', applyLabel);
 
@@ -457,7 +662,6 @@ function render() {
     };
     dEl.addEventListener('keydown', handleEditKey);
     lEl.addEventListener('keydown', handleEditKey);
-    // Some mobile keyboards only fire keypress for Enter
     dEl.addEventListener('keypress', e => { if (isEnter(e)) { e.preventDefault(); commit(); } });
     lEl.addEventListener('keypress', e => { if (isEnter(e)) { e.preventDefault(); commit(); } });
   }
@@ -478,11 +682,10 @@ function remove(i) {
 function clearAll() {
   steps.length = 0;
   editingIndex = -1;
-  // Reset start time to now
+  currentScheduleName = '';
   const n = new Date();
   let h = n.getHours(), m = n.getMinutes();
-  const p = h < 12 ? 'AM' : 'PM';
-  document.getElementById('startInput').value = (h % 12 || 12) + ':' + String(m).padStart(2, '0') + '\u202f' + p;
+  document.getElementById('startInput').value = (h % 12 || 12) + ':' + String(m).padStart(2, '0') + '\u202f' + (h < 12 ? 'AM' : 'PM');
   render();
   save();
 }
@@ -518,13 +721,17 @@ document.getElementById('startInput').addEventListener('input', () => {
   save();
 });
 
+/* ---------- Storage ---------- */
+
 const STORAGE_KEY = 'timeCalc.v1';
+const SCHEDULES_KEY = 'timeCalc.schedules.v1';
 
 function save() {
   try {
     const data = {
       startTime: document.getElementById('startInput').value,
       steps: steps,
+      currentScheduleName: currentScheduleName,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) { /* quota or private mode — ignore */ }
@@ -543,19 +750,184 @@ function load() {
           steps.push({ dur: s.dur, memo: typeof s.memo === 'string' ? s.memo : '' });
         }
       });
+      currentScheduleName = typeof data.currentScheduleName === 'string' ? data.currentScheduleName : '';
       return true;
     }
   } catch (e) { /* corrupt data — start fresh */ }
   return false;
 }
 
+function loadSchedules() {
+  try {
+    const raw = localStorage.getItem(SCHEDULES_KEY);
+    if (!raw) return {};
+    const data = JSON.parse(raw);
+    return (data && typeof data === 'object') ? data : {};
+  } catch (e) { return {}; }
+}
+
+function saveSchedules(obj) {
+  try {
+    localStorage.setItem(SCHEDULES_KEY, JSON.stringify(obj));
+  } catch (e) { /* ignore */ }
+}
+
+/* ---------- Sheets ---------- */
+
+function openSheet(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeSheet(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close sheet when tapping backdrop
+['loadSheet', 'saveSheet'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    if (e.target.id === id) closeSheet(id);
+  });
+});
+
+/* ---------- Load flow ---------- */
+
+function openLoadSheet() {
+  renderLoadSheet();
+  openSheet('loadSheet');
+}
+
+function renderLoadSheet() {
+  const body = document.getElementById('loadSheetBody');
+  const schedules = loadSchedules();
+  const names = Object.keys(schedules).sort((a, b) => a.localeCompare(b));
+  if (!names.length) {
+    body.innerHTML = '<div class="sheet-empty">No saved schedules yet.<br>Build a timeline and tap Save to create one.</div>';
+    return;
+  }
+  let html = '<div class="schedule-list">';
+  names.forEach(name => {
+    const sched = schedules[name];
+    const stepCount = Array.isArray(sched.steps) ? sched.steps.length : 0;
+    const totalMins = Array.isArray(sched.steps) ? sched.steps.reduce((sum, s) => sum + (s.dur || 0), 0) : 0;
+    const meta = (stepCount === 1 ? '1 step' : stepCount + ' steps') + ' · ' + formatDur(totalMins);
+    html += `<div class="schedule-item" onclick="loadSchedule('${escapeHtml(name).replace(/'/g, "\\'")}')">
+      <div class="schedule-item-info">
+        <div class="schedule-item-name">${escapeHtml(name)}</div>
+        <div class="schedule-item-meta">${meta}</div>
+      </div>
+      <button class="schedule-item-delete" onclick="event.stopPropagation();deleteSchedule('${escapeHtml(name).replace(/'/g, "\\'")}')" aria-label="Delete">×</button>
+    </div>`;
+  });
+  html += '</div>';
+  body.innerHTML = html;
+}
+
+function loadSchedule(name) {
+  const schedules = loadSchedules();
+  const sched = schedules[name];
+  if (!sched || !Array.isArray(sched.steps)) return;
+
+  if (steps.length && !confirm('Replace the current timeline with "' + name + '"?')) {
+    return;
+  }
+
+  steps.length = 0;
+  sched.steps.forEach(s => {
+    if (typeof s.dur === 'number' && s.dur > 0) {
+      steps.push({ dur: s.dur, memo: typeof s.memo === 'string' ? s.memo : '' });
+    }
+  });
+  currentScheduleName = name;
+  editingIndex = -1;
+  closeSheet('loadSheet');
+  render();
+  save();
+}
+
+function deleteSchedule(name) {
+  if (!confirm('Delete "' + name + '"? This cannot be undone.')) return;
+  const schedules = loadSchedules();
+  delete schedules[name];
+  saveSchedules(schedules);
+  // If the currently loaded schedule was deleted, clear its name (but keep the timeline)
+  if (currentScheduleName === name) {
+    currentScheduleName = '';
+    render();
+    save();
+  }
+  renderLoadSheet();
+}
+
+/* ---------- Save flow ---------- */
+
+let saveMode = 'new'; // 'new' | 'update'
+
+function openSaveSheet() {
+  if (!steps.length) return;
+  const input = document.getElementById('saveNameInput');
+  const title = document.getElementById('saveSheetTitle');
+  const btn = document.getElementById('saveConfirmBtn');
+
+  if (currentScheduleName) {
+    // Offer both: update current, or save as new
+    saveMode = 'update';
+    title.textContent = 'Save schedule';
+    input.value = currentScheduleName;
+    btn.textContent = 'Save';
+  } else {
+    saveMode = 'new';
+    title.textContent = 'Save schedule';
+    input.value = '';
+    btn.textContent = 'Save';
+  }
+  openSheet('saveSheet');
+  setTimeout(() => { input.focus(); input.select(); }, 50);
+}
+
+document.getElementById('saveNameInput').addEventListener('keydown', e => {
+  if (isEnterKey(e)) { e.preventDefault(); confirmSave(); }
+});
+
+function confirmSave() {
+  const input = document.getElementById('saveNameInput');
+  const name = input.value.trim();
+  if (!name) { input.focus(); return; }
+  if (!steps.length) return;
+
+  const schedules = loadSchedules();
+  const existed = Object.prototype.hasOwnProperty.call(schedules, name);
+
+  // If overwriting a different existing schedule, confirm
+  if (existed && name !== currentScheduleName) {
+    if (!confirm('Overwrite existing schedule "' + name + '"?')) return;
+  }
+
+  // If renaming (current schedule has a different name, and we're saving to a new name),
+  // ask whether to delete the old one
+  if (currentScheduleName && name !== currentScheduleName) {
+    if (confirm('Also delete the old schedule "' + currentScheduleName + '"?')) {
+      delete schedules[currentScheduleName];
+    }
+  }
+
+  schedules[name] = {
+    steps: steps.map(s => ({ dur: s.dur, memo: s.memo || '' })),
+    savedAt: Date.now(),
+  };
+  saveSchedules(schedules);
+  currentScheduleName = name;
+  closeSheet('saveSheet');
+  render();
+  save();
+}
+
+/* ---------- Init ---------- */
+
 (function init() {
   const loaded = load();
   if (!loaded) {
     const n = new Date();
     let h = n.getHours(), m = n.getMinutes();
-    const p = h < 12 ? 'AM' : 'PM';
-    document.getElementById('startInput').value = (h % 12 || 12) + ':' + String(m).padStart(2, '0') + '\u202f' + p;
+    document.getElementById('startInput').value = (h % 12 || 12) + ':' + String(m).padStart(2, '0') + '\u202f' + (h < 12 ? 'AM' : 'PM');
   }
   render();
 })();
