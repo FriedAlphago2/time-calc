@@ -452,7 +452,7 @@ function render() {
     dEl.addEventListener('blur', maybeCommit);
     lEl.addEventListener('blur', maybeCommit);
     dEl.addEventListener('keydown', e => {
-      if (e.key === 'Enter') { e.preventDefault(); applyDur(); lEl.focus(); }
+      if (e.key === 'Enter') { e.preventDefault(); commit(); }
       if (e.key === 'Escape') { committed = true; editingIndex = -1; render(); }
     });
     lEl.addEventListener('keydown', e => {
