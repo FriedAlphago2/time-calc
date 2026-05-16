@@ -288,11 +288,9 @@
   <div class="entry-block">
     <div class="section-label" style="margin-bottom:10px">Add a step</div>
     <div class="entry-row">
-      <input class="dur-input" id="durInput" type="text" placeholder="45" autocomplete="off" autocorrect="off" inputmode="text" />
-      <input class="memo-input" id="memoInput" type="text" placeholder="label (optional)" autocomplete="off" autocorrect="off" />
+      <input class="dur-input" id="durInput" type="text" placeholder="45" autocomplete="off" autocorrect="off" inputmode="text" enterkeyhint="next" />
+      <input class="memo-input" id="memoInput" type="text" placeholder="label (optional)" autocomplete="off" autocorrect="off" enterkeyhint="done" />
     </div>
-    <button class="add-btn" id="addBtn">Add step</button>
-    <div class="hint">45 · 1h30 · 1:30 · 1.5h · 90</div>
   </div>
 
 </div>
@@ -451,14 +449,17 @@ function render() {
 
     dEl.addEventListener('blur', maybeCommit);
     lEl.addEventListener('blur', maybeCommit);
-    dEl.addEventListener('keydown', e => {
-      if (e.key === 'Enter') { e.preventDefault(); commit(); }
-      if (e.key === 'Escape') { committed = true; editingIndex = -1; render(); }
-    });
-    lEl.addEventListener('keydown', e => {
-      if (e.key === 'Enter') { e.preventDefault(); commit(); }
-      if (e.key === 'Escape') { committed = true; editingIndex = -1; render(); }
-    });
+
+    const isEnter = e => e.key === 'Enter' || e.keyCode === 13 || e.which === 13;
+    const handleEditKey = (e) => {
+      if (isEnter(e)) { e.preventDefault(); commit(); }
+      else if (e.key === 'Escape') { committed = true; editingIndex = -1; render(); }
+    };
+    dEl.addEventListener('keydown', handleEditKey);
+    lEl.addEventListener('keydown', handleEditKey);
+    // Some mobile keyboards only fire keypress for Enter
+    dEl.addEventListener('keypress', e => { if (isEnter(e)) { e.preventDefault(); commit(); } });
+    lEl.addEventListener('keypress', e => { if (isEnter(e)) { e.preventDefault(); commit(); } });
   }
 }
 
@@ -474,9 +475,19 @@ function remove(i) {
   render();
   save();
 }
-function clearAll() { steps.length = 0; editingIndex = -1; render(); save(); }
+function clearAll() {
+  steps.length = 0;
+  editingIndex = -1;
+  // Reset start time to now
+  const n = new Date();
+  let h = n.getHours(), m = n.getMinutes();
+  const p = h < 12 ? 'AM' : 'PM';
+  document.getElementById('startInput').value = (h % 12 || 12) + ':' + String(m).padStart(2, '0') + '\u202f' + p;
+  render();
+  save();
+}
 
-document.getElementById('addBtn').addEventListener('click', () => {
+function addStep() {
   const d = document.getElementById('durInput');
   const dur = parseDuration(d.value);
   if (!dur) {
@@ -492,13 +503,15 @@ document.getElementById('addBtn').addEventListener('click', () => {
   d.focus();
   render();
   save();
-});
+}
+
+const isEnterKey = e => e.key === 'Enter' || e.keyCode === 13 || e.which === 13;
 
 document.getElementById('durInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('memoInput').focus();
+  if (isEnterKey(e)) { e.preventDefault(); document.getElementById('memoInput').focus(); }
 });
 document.getElementById('memoInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('addBtn').click();
+  if (isEnterKey(e)) { e.preventDefault(); addStep(); }
 });
 document.getElementById('startInput').addEventListener('input', () => {
   render();
