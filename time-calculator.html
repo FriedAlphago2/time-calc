@@ -422,6 +422,7 @@ function render() {
       steps[editingIndex].memo = lEl.value.trim();
       editingIndex = -1;
       render();
+      save();
     };
     dEl.addEventListener('blur', e => {
       // only commit if focus is leaving the edit row entirely
@@ -455,8 +456,9 @@ function remove(i) {
   else if (editingIndex > i) editingIndex--;
   steps.splice(i, 1);
   render();
+  save();
 }
-function clearAll() { steps.length = 0; editingIndex = -1; render(); }
+function clearAll() { steps.length = 0; editingIndex = -1; render(); save(); }
 
 document.getElementById('addBtn').addEventListener('click', () => {
   const d = document.getElementById('durInput');
@@ -473,6 +475,7 @@ document.getElementById('addBtn').addEventListener('click', () => {
   document.getElementById('memoInput').value = '';
   d.focus();
   render();
+  save();
 });
 
 document.getElementById('durInput').addEventListener('keydown', e => {
@@ -481,13 +484,51 @@ document.getElementById('durInput').addEventListener('keydown', e => {
 document.getElementById('memoInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('addBtn').click();
 });
-document.getElementById('startInput').addEventListener('input', render);
+document.getElementById('startInput').addEventListener('input', () => {
+  render();
+  save();
+});
+
+const STORAGE_KEY = 'timeCalc.v1';
+
+function save() {
+  try {
+    const data = {
+      startTime: document.getElementById('startInput').value,
+      steps: steps,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) { /* quota or private mode — ignore */ }
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (data && typeof data.startTime === 'string' && Array.isArray(data.steps)) {
+      document.getElementById('startInput').value = data.startTime;
+      steps.length = 0;
+      data.steps.forEach(s => {
+        if (typeof s.dur === 'number' && s.dur > 0) {
+          steps.push({ dur: s.dur, memo: typeof s.memo === 'string' ? s.memo : '' });
+        }
+      });
+      return true;
+    }
+  } catch (e) { /* corrupt data — start fresh */ }
+  return false;
+}
 
 (function init() {
-  const n = new Date();
-  let h = n.getHours(), m = n.getMinutes();
-  const p = h < 12 ? 'AM' : 'PM';
-  document.getElementById('startInput').value = (h % 12 || 12) + ':' + String(m).padStart(2, '0') + '\u202f' + p;
+  const loaded = load();
+  if (!loaded) {
+    const n = new Date();
+    let h = n.getHours(), m = n.getMinutes();
+    const p = h < 12 ? 'AM' : 'PM';
+    document.getElementById('startInput').value = (h % 12 || 12) + ':' + String(m).padStart(2, '0') + '\u202f' + p;
+  }
+  render();
 })();
 </script>
 </body>
