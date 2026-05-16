@@ -417,28 +417,42 @@ function render() {
     dEl.focus();
     dEl.select();
     let committed = false;
+
+    // Apply the duration value to steps[] right now (without exiting edit mode)
+    const applyDur = () => {
+      const newDur = parseDuration(dEl.value);
+      if (newDur) steps[editingIndex].dur = newDur;
+    };
+    // Apply the label value to steps[] right now
+    const applyLabel = () => {
+      steps[editingIndex].memo = lEl.value.trim();
+    };
+    // Final commit: apply both and exit edit mode
     const commit = () => {
       if (committed) return;
       committed = true;
-      const newDur = parseDuration(dEl.value);
-      if (newDur) steps[editingIndex].dur = newDur;
-      steps[editingIndex].memo = lEl.value.trim();
+      applyDur();
+      applyLabel();
       editingIndex = -1;
       render();
       save();
     };
     const maybeCommit = () => {
-      // small delay so focus can settle between the two fields
       setTimeout(() => {
         if (document.activeElement !== dEl && document.activeElement !== lEl) {
           commit();
         }
       }, 100);
     };
+
+    // Apply duration on every keystroke so it's never lost
+    dEl.addEventListener('input', applyDur);
+    lEl.addEventListener('input', applyLabel);
+
     dEl.addEventListener('blur', maybeCommit);
     lEl.addEventListener('blur', maybeCommit);
     dEl.addEventListener('keydown', e => {
-      if (e.key === 'Enter') { e.preventDefault(); lEl.focus(); }
+      if (e.key === 'Enter') { e.preventDefault(); applyDur(); lEl.focus(); }
       if (e.key === 'Escape') { committed = true; editingIndex = -1; render(); }
     });
     lEl.addEventListener('keydown', e => {
