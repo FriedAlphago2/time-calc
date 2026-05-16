@@ -416,7 +416,10 @@ function render() {
     const lEl = document.getElementById('editLabel');
     dEl.focus();
     dEl.select();
+    let committed = false;
     const commit = () => {
+      if (committed) return;
+      committed = true;
       const newDur = parseDuration(dEl.value);
       if (newDur) steps[editingIndex].dur = newDur;
       steps[editingIndex].memo = lEl.value.trim();
@@ -424,24 +427,23 @@ function render() {
       render();
       save();
     };
-    dEl.addEventListener('blur', e => {
-      // only commit if focus is leaving the edit row entirely
+    const maybeCommit = () => {
+      // small delay so focus can settle between the two fields
       setTimeout(() => {
-        if (document.activeElement !== lEl) commit();
-      }, 0);
-    });
-    lEl.addEventListener('blur', e => {
-      setTimeout(() => {
-        if (document.activeElement !== dEl) commit();
-      }, 0);
-    });
+        if (document.activeElement !== dEl && document.activeElement !== lEl) {
+          commit();
+        }
+      }, 100);
+    };
+    dEl.addEventListener('blur', maybeCommit);
+    lEl.addEventListener('blur', maybeCommit);
     dEl.addEventListener('keydown', e => {
       if (e.key === 'Enter') { e.preventDefault(); lEl.focus(); }
-      if (e.key === 'Escape') { editingIndex = -1; render(); }
+      if (e.key === 'Escape') { committed = true; editingIndex = -1; render(); }
     });
     lEl.addEventListener('keydown', e => {
       if (e.key === 'Enter') { e.preventDefault(); commit(); }
-      if (e.key === 'Escape') { editingIndex = -1; render(); }
+      if (e.key === 'Escape') { committed = true; editingIndex = -1; render(); }
     });
   }
 }
