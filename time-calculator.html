@@ -107,7 +107,7 @@
   }
 
   /* Timeline */
-  .timeline { flex: 1; margin-bottom: 20px; }
+  .timeline { flex: 1; margin-bottom: 8px; }
 
   .timeline-empty {
     font-size: 14px;
@@ -212,8 +212,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 8px;
+    padding-top: 4px;
+    margin-bottom: 16px;
     gap: 6px;
+    min-height: 24px;
   }
   .action-row-left, .action-row-right {
     display: flex;
@@ -445,6 +447,16 @@
     <div class="timeline-empty">Add steps below to build your timeline.</div>
   </div>
 
+  <div class="action-row" id="actionRow">
+    <div class="action-row-left">
+      <button class="text-btn" onclick="openLoadSheet()">Load</button>
+      <button class="text-btn" id="saveBtn" onclick="openSaveSheet()" disabled>Save</button>
+    </div>
+    <div class="action-row-right">
+      <button class="text-btn muted" id="clearBtn" onclick="clearAll()" style="display:none">Clear all</button>
+    </div>
+  </div>
+
   <div class="entry-block">
     <div class="section-label" style="margin-bottom:10px">Add a step</div>
     <div class="entry-row">
@@ -574,8 +586,12 @@ function renderScheduleName() {
 function render() {
   renderScheduleName();
   const tl = document.getElementById('timeline');
+  const saveBtn = document.getElementById('saveBtn');
+  const clearBtn = document.getElementById('clearBtn');
   if (!steps.length) {
     tl.innerHTML = '<div class="timeline-empty">Add steps below to build your timeline.</div>';
+    saveBtn.disabled = true;
+    clearBtn.style.display = 'none';
     return;
   }
   const start = getStart();
@@ -607,16 +623,11 @@ function render() {
     }
   });
   html += `<div class="total-row"><span class="total-label">Total elapsed</span><span class="total-val">${formatDur(total)}</span></div>`;
-  html += `<div class="action-row">
-    <div class="action-row-left">
-      <button class="text-btn" onclick="openLoadSheet()">Load</button>
-      <button class="text-btn" onclick="openSaveSheet()" ${steps.length ? '' : 'disabled'}>Save</button>
-    </div>
-    <div class="action-row-right">
-      <button class="text-btn muted" onclick="clearAll()">Clear all</button>
-    </div>
-  </div>`;
   tl.innerHTML = html;
+
+  // Steps exist at this point
+  saveBtn.disabled = false;
+  clearBtn.style.display = '';
 
   if (editingIndex >= 0) {
     const dEl = document.getElementById('editDur');
