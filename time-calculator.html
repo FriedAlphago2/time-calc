@@ -132,6 +132,12 @@
     flex-shrink: 0;
   }
 
+  .step-dur {
+    font-size: 15px;
+    color: var(--text2);
+    flex-shrink: 0;
+  }
+
   .step-label {
     font-size: 15px;
     color: var(--text2);
@@ -144,6 +150,7 @@
     min-width: 0;
     display: flex;
     align-items: baseline;
+    gap: 10px;
     cursor: pointer;
   }
 
@@ -602,21 +609,32 @@ function render() {
     if (cursor !== null) cursor += s.dur;
     total += s.dur;
     const t = cursor !== null ? formatTime(cursor) : '+' + formatDur(s.dur);
-    const lbl = s.memo || formatDur(s.dur);
+    const durStr = formatDur(s.dur);
+    const hasMemo = !!s.memo;
     if (i === editingIndex) {
       html += `<div class="step-row">
         <span class="step-time">${t}</span>
         <div class="step-edit-row">
-          <input class="step-edit-dur" id="editDur" type="text" value="${escapeHtml(formatDur(s.dur))}" autocomplete="off" />
+          <input class="step-edit-dur" id="editDur" type="text" value="${escapeHtml(durStr)}" autocomplete="off" />
           <input class="step-edit-label" id="editLabel" type="text" value="${escapeHtml(s.memo)}" placeholder="label" autocomplete="off" />
         </div>
         <button class="step-delete" onclick="remove(${i})" aria-label="Remove">×</button>
       </div>`;
-    } else {
+    } else if (hasMemo) {
       html += `<div class="step-row">
         <div class="step-content" onclick="startEdit(${i})">
           <span class="step-time">${t}</span>
-          <span class="step-label">${escapeHtml(lbl)}</span>
+          <span class="step-dur">${escapeHtml(durStr)}</span>
+          <span class="step-label">${escapeHtml(s.memo)}</span>
+        </div>
+        <button class="step-delete" onclick="remove(${i})" aria-label="Remove">×</button>
+      </div>`;
+    } else {
+      // No label — show duration once in the label slot (existing fallback behavior)
+      html += `<div class="step-row">
+        <div class="step-content" onclick="startEdit(${i})">
+          <span class="step-time">${t}</span>
+          <span class="step-label">${escapeHtml(durStr)}</span>
         </div>
         <button class="step-delete" onclick="remove(${i})" aria-label="Remove">×</button>
       </div>`;
